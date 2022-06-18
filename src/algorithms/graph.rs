@@ -45,3 +45,96 @@ pub struct Node<'a, T> {
 	  }
 	}
   }
+
+/////////// DFS
+use std::vec;
+
+struct Tree<T> {
+    children: Vec<Tree<T>>,
+    value: T
+}
+
+impl<T> Tree<T> {
+    pub fn new(value: T) -> Self{
+        Tree{
+            children: vec![],
+            value
+        }
+    }
+
+    pub fn dfs<F: Fn(&T)>(&self, f: F) {
+       self.dfs_helper(&f);
+    }
+
+    fn dfs_helper<F: Fn(&T)>(&self, f: &F) {
+        (f)(&self.value);
+        for child in &self.children {
+            child.dfs_helper(f);
+        }
+    }
+}
+
+
+fn main() {
+    let t: Tree<i32> = Tree {
+        children: vec![
+            Tree {
+                children: vec![
+                    Tree {
+                        children: vec![],
+                        value: 14
+                    }
+                ],
+                value: 28
+            },
+            Tree {
+                children: vec![],
+                value: 80
+            }
+        ],
+        value: 50
+    };
+
+    t.dfs(|node| { println!("{}", node); });
+}
+
+
+/// BFS
+use std::collections::VecDeque;
+
+struct Tree<V> {
+    children: Vec<Tree<V>>,
+    value: V
+}
+
+impl<V> Tree<V> {
+    fn bfs(&self, f: impl Fn(&V)) {
+        let mut q = VecDeque::new();
+        q.push_back(self);
+
+        while let Some(t) = q.pop_front() {
+            (f)(&t.value);
+            for child in &t.children {
+                q.push_back(child);
+            }
+        }
+    }
+}
+
+fn main() {
+    let t = Tree {
+        children: vec![
+            Tree {
+                children: vec![
+                    Tree { children: vec![], value: 5 },
+                    Tree { children: vec![], value: 6 }
+                ],
+                value: 2
+            },
+            Tree { children: vec![], value: 3 },
+            Tree { children: vec![], value: 4 },
+        ],
+        value: 1
+    };
+    t.bfs(|v| println!("{}", v));
+}
